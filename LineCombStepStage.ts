@@ -60,6 +60,7 @@ const drawLCSNode : Function = (context : CanvasRenderingContext2D, i : number, 
 class LineCombStepStage {
     canvas : HTMLCanvasElement = document.createElement('canvas')
     context : CanvasRenderingContext2D
+    renderer : Renderer = new Renderer()
 
     initCanvas() {
         this.canvas.width = w
@@ -71,11 +72,14 @@ class LineCombStepStage {
     render() {
         this.context.fillStyle = backColor
         this.context.fillRect(0, 0, w, h)
+        this.renderer.render(this.context)
     }
 
     handleTap() {
         this.canvas.onmousedown = () => {
-
+            this.renderer.handleTap(() => {
+                this.render()
+            })
         }
     }
 
