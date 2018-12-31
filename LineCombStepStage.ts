@@ -194,3 +194,25 @@ class LineCombStep {
         this.curr.startUpdating(cb)
     }
 }
+
+class Renderer {
+
+    lcs : LineCombStep = new LineCombStep()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.lcs.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.lcs.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.lcs.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
+    }
+}
