@@ -1,12 +1,13 @@
 const w : number = window.innerWidth, h : number = window.innerHeight
 const nodes : number = 5
-const lines : number = 5
+const lines : number = 10
 const scGap : number = 0.05
 const scDiv : number = 0.51
 const strokeFactor : number = 90
 const sizeFactor : number = 2.8
 const color : string = "#43A047"
 const backColor : string = "#bdbdbd"
+const delay : number = 30
 
 const maxScale : Function = (scale : number, i : number, n : number) : number => {
     return Math.max(0, scale - i / n)
@@ -32,13 +33,13 @@ const drawLCSNode : Function = (context : CanvasRenderingContext2D, i : number, 
     const sc1 : number = divideScale(scale, 0, 2)
     const sc2 : number = divideScale(scale, 1, 2)
     const size : number = gap / sizeFactor
-    const xGap : number = size / lines
+    const xGap : number = size / (lines - 1)
     context.strokeStyle = color
     context.lineWidth = Math.min(w, h) / strokeFactor
     context.lineCap = 'round'
     context.save()
     context.translate(gap * (i + 1), h/2)
-    context.rotate(Math.PI/2 * sc1)
+    context.rotate(Math.PI/2 * sc2)
     context.translate(-size, 0)
     context.beginPath()
     context.moveTo(0, 0)
@@ -50,7 +51,7 @@ const drawLCSNode : Function = (context : CanvasRenderingContext2D, i : number, 
         context.translate(xGap * j, 0)
         context.beginPath()
         context.moveTo(0, 0)
-        context.lineTo(0, -xGap)
+        context.lineTo(0, -2 * xGap * sc)
         context.stroke()
         context.restore()
     }
@@ -98,7 +99,7 @@ class Animator {
     start(cb : Function) {
         if (!this.animated) {
             this.animated = true
-            this.interval = setInterval(cb, 50)
+            this.interval = setInterval(cb, delay)
         }
     }
 
@@ -117,6 +118,7 @@ class State {
 
     update(cb : Function) {
         this.scale += updateScale(this.scale, this.dir, lines, 1)
+        console.log(this.scale)
         if (Math.abs(this.scale - this.prevScale) > 1) {
             this.scale = this.prevScale + this.dir
             this.dir = 0
@@ -190,8 +192,9 @@ class LineCombStep {
             this.curr = this.curr.getNext(this.dir, () => {
                 this.dir *= -1
             })
+            cb()
         })
-        cb()
+
     }
 
     startUpdating(cb : Function) {
