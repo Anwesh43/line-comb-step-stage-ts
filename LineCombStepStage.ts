@@ -27,6 +27,36 @@ const updateScale : Function = (scale : number, dir : number, a : number, b : nu
     return mirrorValue(scale, a, b) * dir * scGap
 }
 
+const drawLCSNode : Function = (context : CanvasRenderingContext2D, i : number, scale : number) => {
+    const gap : number = w / (nodes + 1)
+    const sc1 : number = divideScale(scale, 0, 2)
+    const sc2 : number = divideScale(scale, 1, 2)
+    const size : number = gap / sizeFactor
+    const xGap : number = size / lines
+    context.strokeStyle = color
+    context.lineWidth = Math.min(w, h) / strokeFactor
+    context.lineCap = 'round'
+    context.save()
+    context.translate(gap * (i + 1), h/2)
+    context.rotate(Math.PI/2 * sc1)
+    context.translate(-size, 0)
+    context.beginPath()
+    context.moveTo(0, 0)
+    context.lineTo(2 * size, 0)
+    context.stroke()
+    for (var j = 0; j < lines; j++) {
+        const sc = divideScale(sc1, j, lines)
+        context.save()
+        context.translate(xGap * j, 0)
+        context.beginPath()
+        context.moveTo(0, 0)
+        context.lineTo(0, -xGap)
+        context.stroke()
+        context.restore()
+    }
+    context.restore()
+}
+
 class LineCombStepStage {
     canvas : HTMLCanvasElement = document.createElement('canvas')
     context : CanvasRenderingContext2D
