@@ -112,7 +112,7 @@ class State {
     prevScale : number = 0
 
     update(cb : Function) {
-        this.scale += updateScale(this.scale)
+        this.scale += updateScale(this.scale, this.dir, lines, 1)
         if (Math.abs(this.scale - this.prevScale) > 1) {
             this.scale = this.prevScale + this.dir
             this.dir = 0
@@ -126,5 +126,49 @@ class State {
             this.dir = 1 - 2 * this.prevScale
             cb()
         }
+    }
+}
+
+class LCSNode {
+    prev : LCSNode
+    next : LCSNode
+    state : State = new State()
+
+    constructor(private i : number) {
+        this.addNeighbor()
+    }
+
+    addNeighbor() {
+        if (this.i < nodes - 1) {
+            this.next = new LCSNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    draw(context : CanvasRenderingContext2D) {
+        drawLCSNode(context, this.i, this.state.scale)
+        if (this.next) {
+            this.next.draw(context)
+        }
+    }
+
+    update(cb : Function) {
+        this.state.update(cb)
+    }
+
+    startUpdating(cb : Function) {
+        this.state.startUpdating(cb)
+    }
+
+    getNext(dir : number, cb : Function) : LCSNode {
+        var curr : LCSNode = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr) {
+            return curr
+        }
+        cb()
+        return this 
     }
 }
